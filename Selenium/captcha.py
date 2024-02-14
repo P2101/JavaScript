@@ -15,3 +15,6 @@ time.sleep(2)
 driver.switch_to.frame(0) # Para hacer click en el CAPTCHA
 
 driver.find_element(By.XPATH, '//*[@id="recaptcha-anchor"]').click()
+
+
+# https://www.youtube.com/watch?v=22nNo4XQQpg&ab_channel=Palaus
