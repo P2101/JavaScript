@@ -1,4 +1,4 @@
-# Para obtener el HTML (A veces no puede devolverlo entero)
+// Para obtener el HTML (A veces no puede devolverlo entero)
 const puppeteer = require('puppeteer');
 
 (async () => {
@@ -10,7 +10,9 @@ const puppeteer = require('puppeteer');
     const page = await browser.newPage();
 
     // Navegar a la URL deseada
-    await page.goto('https://www.twitch.tv/');
+    // await page.goto('https://www.twitch.tv/');
+    const url = 'https://www.twitch.tv/'
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
 
     // Obtener el HTML de la página
     const htmlContent = await page.content();
@@ -20,4 +22,3 @@ const puppeteer = require('puppeteer');
 
     await browser.close();
 })();
-
