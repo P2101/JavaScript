@@ -11,6 +11,7 @@ const puppeteer = require('puppeteer');
     const url = 'https://www.chollometro.com/';
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
     const html = await page.content();
+    // console.log(html)
 
     const regex = /INITIAL_STATE__ = (.*?);/;
     const json = html.match(regex);
