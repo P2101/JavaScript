@@ -26,8 +26,8 @@ const puppeteer = require("puppeteer");
   await page.goto("https://www.google.com/search?q=ping+pong");
 
   try {
-    const titles = await page.$$eval('a div[role="link"]', (links) => { // función links con todos los links
-      return links.map((link) => {
+    const titles = await page.$$eval('a div[role="link"]', (links) => { // función links con todos los divs con el role=links
+      return links.map((link) => { // función que recorre todos los divs
         return link.innerText;
       });
     });
