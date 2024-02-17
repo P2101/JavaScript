@@ -21,13 +21,13 @@ const puppeteer = require("puppeteer");
     "x-client-data":
       "CJe2yQEIorbJAQipncoBCITnygEIlqHLAQiFoM0BCI/hzQEIn+7NAQin7s0BCN3uzQEIg/DNAQiG8M0BCMDxzQEIrvLNAQj7880BCJD1zQEInvbNARjimM0BGKfqzQEY+fLNAQ==",
   };
- 
+
   await page.setExtraHTTPHeaders(headers);
   await page.goto("https://www.google.com/search?q=ping+pong");
 
   try {
-    const titles = await page.$$eval('a div[role="link"]', (links) => { // función links con todos los divs con el role=links
-      return links.map((link) => { // función que recorre todos los divs
+    const titles = await page.$$eval('a div[role="link"]', (links) => { // función links con todos los links
+      return links.map((link) => {
         return link.innerText;
       });
     });
