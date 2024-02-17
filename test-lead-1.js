@@ -21,7 +21,7 @@ const puppeteer = require("puppeteer");
     "x-client-data":
       "CJe2yQEIorbJAQipncoBCITnygEIlqHLAQiFoM0BCI/hzQEIn+7NAQin7s0BCN3uzQEIg/DNAQiG8M0BCMDxzQEIrvLNAQj7880BCJD1zQEInvbNARjimM0BGKfqzQEY+fLNAQ==",
   };
-
+ 
   await page.setExtraHTTPHeaders(headers);
   await page.goto("https://www.google.com/search?q=ping+pong");
 
