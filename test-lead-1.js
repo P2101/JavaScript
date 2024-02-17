@@ -27,7 +27,7 @@ const puppeteer = require("puppeteer");
 
   try {
     const titles = await page.$$eval('a div[role="link"]', (links) => { // función links con todos los links
-      return links.map((link) => {
+      return links.map((link) => {  // Función para recorrer todos los divs
         return link.innerText;
       });
     });
