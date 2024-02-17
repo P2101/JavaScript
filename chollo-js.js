@@ -12,7 +12,7 @@ const puppeteer = require('puppeteer');
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
     const html = await page.content();
 
-    const regex = /INITIAL_STATE__ = (.*?);/;
+    const regex = /INITIAL_STATE__ = (.*?);/i;
     const json = html.match(regex);
 
     
@@ -36,7 +36,6 @@ const puppeteer = require('puppeteer');
             // Faltaría añadirlas en un object
         });
   
-        console.log()
     } else {
         console.log("No se encontró el mensaje.");
     }
