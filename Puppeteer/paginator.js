@@ -30,6 +30,7 @@ const sleep = (milliseconds) => {
       let title = "Null";
       let price = "Null";
       let img = "Null";
+      let url = "Null";
 
       try {
         title = await page.evaluate(
@@ -52,13 +53,20 @@ const sleep = (milliseconds) => {
           producthandle
         );
       } catch (error) {}
+      try{
+        url = await page.evaluate(
+          (el) => el.querySelector('a.a-link-normal').href,
+          producthandle
+        );
+      }catch (error) {}
       if (title !== "Null") {
         items.push(title);
         items.push(price);
         items.push(img);
+        items.push(url);
         fs.appendFile(
           "results.csv",
-          `${title.replace(/,/g, ".")},${price},${img}\n`,
+          `${title.replace(/,/g, ".")},${price},${img},${url}\n`,
           function (err) {
             if (err) throw err;
           }
