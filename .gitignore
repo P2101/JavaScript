@@ -1,0 +1,14 @@
+# Ignorar archivos de log
+*.log
+
+# Ignorar archivos de compilación
+*.class
+*.jar
+
+# Ignorar directorios específicos
+/target/
+/node_modules/
+/tmp/
+
+# Ignorar archivos específicos
+config.json
