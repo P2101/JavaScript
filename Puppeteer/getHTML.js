@@ -5,6 +5,9 @@ const puppeteer = require('puppeteer');
         headless: false,
         defaultViewport: null,
         userDataDir: "./tmp",
+        //args: [
+        //    '--proxy-server=https://IP:Port'
+        //]
         // args: ['--incognito'] // Esta línea activa el modo incógnito, verificar si funciona
     });
     const page = await browser.newPage();
