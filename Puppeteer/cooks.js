@@ -32,9 +32,9 @@ const fs = require('fs').promises;
     //     console.log('yes');
     // }
 
-    await page.type('#login-email', 'pferre11@gmx.es');
+    await page.type('#login-email', 'pferre11@gmail.es');
     await new Promise((resolve) => setTimeout(resolve, 1300));
-    await page.type('#login-password', 'rentadora11');
+    await page.type('#login-password', 'SantBartomeu24');
     await new Promise((resolve) => setTimeout(resolve, 2700));
     await page.click('.login-submit');
     
