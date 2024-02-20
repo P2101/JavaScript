@@ -6,8 +6,10 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 
 puppeteer.use(StealthPlugin())
 
-// puppeteer usage as normal
-puppeteer.launch({ headless: true }).then(async browser => {
+// Usar CHROME, en chrome://version copiamos el executablepath y profilepath e invertimos los slashes.
+// Borrando el profile y eliminando chrome de la barra de tareas para que funcione mejor
+puppeteer.launch({ headless: false, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', userdatadir: 'C:/Users/Pau Pons/AppData/Local/Google/Chrome/User Data' }).then(async browser => {
+// puppeteer.launch({ headless: true }).then(async browser => {
   console.log('Running tests..')
   const page = await browser.newPage()
   await page.goto('https://bot.sannysoft.com')
