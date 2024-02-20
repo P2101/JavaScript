@@ -12,3 +12,6 @@
 
 # Ignorar archivos específicos
 config.json
+
+proves.js
+proves2.js
