@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
+const { log } = require("console");
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -42,7 +43,7 @@ const fs = require("fs");
     } catch (error) {
       console.error("Error:", error);
     }
-     // PARA GUARDAR EN UN CSV
+    // PARA GUARDAR EN UN CSV
     // if (title !== 'Null'){
     //   charters.push(title);
     //   charters.push(boatinfo);
@@ -73,6 +74,30 @@ const fs = require("fs");
     // charters.url = url;
   }
   const chartersJSON = JSON.stringify(charters);
-  console.log(chartersJSON);
+
+  await charter(charters, browser, puppeteer);
+  // console.log(charters);
   await browser.close();
 })();
+
+async function charter(charters, browser, puppeteer) {
+  const page = await browser.newPage();
+
+  for (const charter of charters) {
+    // console.log(charter.url);
+    await page.goto(charter.url);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const html = await page.content();
+
+    if (html.includes("data-code")) {
+      const regex = /data-code="(\d+)"/;
+      const id = html.match(regex);
+
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+      new_url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/${id[1]}/occupation?from=2024-02-01&to=2024-03-01&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
+      console.log(new_url);
+    }
+  }
+}
+
+

@@ -9,8 +9,8 @@ const urls = [
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_PAGE,
     maxConcurrency: 2, // Indicar cuantas queremos a la vez
-    puppeteerOptions: {
-      // Opción como puppeteer.launch
+    puppeteerOptions: { // Opción como puppeteer.launch
+      
       headless: false,
       defaultViewport: null,
       userDataDir: "./tmp",
