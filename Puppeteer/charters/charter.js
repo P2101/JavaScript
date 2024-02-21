@@ -89,15 +89,50 @@ async function charter(charters, browser, puppeteer) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const html = await page.content();
 
-    if (html.includes("data-code")) {
-      const regex = /data-code="(\d+)"/;
-      const id = html.match(regex);
+    if (charter.title.includes("Quicksilver 755 Sundeck")) {
+      if (html.includes("data-code")) {
+        const regex = /data-code="(\d+)"/;
+        const id = html.match(regex);
 
-      await new Promise((resolve) => setTimeout(resolve, 1100));
-      new_url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/${id[1]}/occupation?from=2024-02-01&to=2024-03-01&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
-      console.log(new_url);
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+        new_url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/${id[1]}/occupation?from=2024-04-01&to=2024-05-01&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
+
+        get_price(new_url, browser, puppeteer, charter.title);
+        // console.log(charter.title);
+        // console.log(new_url);
+      }
     }
   }
 }
 
+async function get_price(url, browser, puppeteer, name) {
+  const page = await browser.newPage();
+  await page.goto(url);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const html = await page.content();
+  await new Promise((resolve) => setTimeout(resolve, 1600));
+  const json = await page.evaluate(() => {
+    const preElement = document.querySelector('pre');
+    if (preElement) {
+      return preElement.textContent;
+    }
+    return null;
+  });
+  await new Promise((resolve) => setTimeout(resolve, 1100));
+  const data = JSON.parse(json);
+  const prices = data.prices;
 
+  // Obtener todas las claves del objeto
+  const keys = Object.keys(prices);
+
+  const thirdKey = keys[2];
+  const price = prices[thirdKey];
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.log(`El charter ${name} en la fecha ${thirdKey} tiene un precio ${price}`);
+  // Acceder al tercer elemento del objeto
+  // const price = data[keys[2]]
+  // const date = data[keys[2]];
+  // console.log(`La fecha ${date} tiene un precio ${price}`);
+
+  await browser.close();
+}
