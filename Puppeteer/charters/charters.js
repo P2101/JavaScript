@@ -1,17 +1,24 @@
 const puppeteer = require("puppeteer");
-const axios = require("axios");
+const express = require("express");
 
-(async () => {
-  const boatObjects = await scrapeBoatData();
-  await makeHttpRequests(boatObjects);
-})();
+const app = express();
+app.set("port", 9101);
+app.use(express.json());
 
-async function scrapeBoatData() {
+app.post("/charter", (req, res) => {
+  const barco = req.body.barco;
+  const fecha = req.body.fecha;
+
+  data(barco, fecha);
+});
+
+async function data(barco, fecha) {
   const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
     userDataDir: "./tmp",
   });
+  console.log("putaspanya", barco);
   const page = await browser.newPage();
 
   const url = "https://charterenmenorca.com/alquiler-barcos-menorca/";
@@ -20,100 +27,106 @@ async function scrapeBoatData() {
   await page.waitForSelector(".type-barco_alquiler");
   const boats = await page.$$(".type-barco_alquiler");
 
-  const boatObjects = [];
+  const charters = [];
   for (const boat of boats) {
+    let title = "Null";
+    let info = [];
+    let boatinfo = [];
+    let url = "Null";
+    await new Promise((resolve) => setTimeout(resolve, 600));
     try {
-      const boatObject = {};
-
-      boatObject.title = await page.evaluate(
+      title = await page.evaluate(
         (el) => el.querySelector(".elementor-heading-title > a").textContent,
         boat
       );
+      // console.log("Title:", title);
 
       const boatInfoElements = await boat.$$(".elementor-icon-list-text");
-      boatObject.info = [];
       for (const infoElement of boatInfoElements) {
-        const info = await page.evaluate(
-          (el) => el.textContent.trim(),
-          infoElement
-        );
-        boatObject.info.push(info);
+        info = await page.evaluate((el) => el.textContent.trim(), infoElement);
+        boatinfo.push(info);
+        // console.log("Info:", boatinfo);
       }
-
-      boatObject.url = await page.evaluate(
+      url = await page.evaluate(
         (el) => el.querySelector(".elementor-heading-title > a").href,
         boat
       );
-
-      boatObjects.push(boatObject);
+      // console.log("Url:", url);
     } catch (error) {
       console.error("Error:", error);
     }
+
+    // Convertir a Objeto
+    const boatObject = {
+      title: title,
+      eslora: boatinfo[0].replace("Eslora: ", ""),
+      manga: boatinfo[1].replace("Manga: ", ""),
+      capacidad: boatinfo[2].replace("Capacidad: ", ""),
+      url: url,
+    };
+
+    // Agregar el objeto del barco al array
+    charters.push(boatObject);
   }
 
-  await browser.close();
-  return boatObjects;
+  await charter(charters, browser, barco, fecha);
 }
 
-async function makeHttpRequests(boatObjects) {
-  const ids = [];
-  for (const boatObject of boatObjects) {
+async function charter(charters, browser, barco, fecha) {
+  for (const charter of charters) {
+    const page = await browser.newPage();
     try {
-      const response = await axios.get(boatObject.url);
-      //   const api = /mybooking_api_key":"(.*?)"/i;
-      const id = /data-code="(\d+)"/i;
-      const match = response.data.match(id);
-      if (match[1]) {
-        ids.push(match[1]);
-      }
-      //   console.log(match[1]);
-
-      //   console.log("Response Data for", boatObject.title, ":", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-  //   console.log(ids);
-  getPrice(ids);
-}
-
-async function getPrice(ids) {
-  for (const id of ids) {
-    await new Promise((resolve) => setTimeout(resolve, 4000));
-    try {
-      //   const url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/23/occupation?from=2024-02-01&to=2024-03-01&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
-      const url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/${id}/occupation?from=2024-02-01&to=2024-03-01&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
-      const browser = await puppeteer.launch({
-        headless: false,
-        defaultViewport: null,
-        userDataDir: "./tmp",
-      });
-      const page = await browser.newPage();
-
+      await page.goto(charter.url);
+      await page.waitForSelector("body");
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // const html = await page.content();
 
-      await page.waitForSelector("pre");
-      const json = await page.evaluate(() => {
-        const preElement = document.querySelector("pre");
-        if (preElement) {
-          return preElement.textContent;
+      if (charter.title.includes(barco)) {
+        if (html.includes("data-code")) {
+          const regex = /data-code="(\d+)"/;
+          const id = html.match(regex);
+
+          await new Promise((resolve) => setTimeout(resolve, 1100));
+          new_url = `https://charterenmenorca.mybooking.es/api/booking/frontend/products/${id[1]}/occupation?from=${fecha}&to=${fecha}&api_key=5YTw3PxevdHAJXBk1FlND84uyEr9obVaCWhUKOnLMGcQqZIp&duration_scope=in_one_day&firstday=true`;
+
+          await get_price(new_url, browser, puppeteer, charter.title, fecha);
         }
-        return null;
-      });
-
-      const data = JSON.parse(json);
-      console.log(data.prices);
-      //   const html = await page.content();
-      //   const json = await page.evaluate(
-      //     (el) => el.querySelector('pre'), html
-      //   );
-      //   console.log(json);
-        await browser.close();
+      }
     } catch (error) {
-      console.log("Error: ", error);
+      console.error("Error:", error);
+    } finally {
+      await page.close();
     }
   }
+}
+
+async function get_price(url, browser, puppeteer, name, fecha) {
+  const page = await browser.newPage();
+  await page.goto(url);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  // const html = await page.content();
+  const json = await page.evaluate(() => {
+    const preElement = document.querySelector("pre");
+    if (preElement) {
+      return preElement.textContent;
+    }
+    return null;
+  });
+  await new Promise((resolve) => setTimeout(resolve, 1100));
+  const data = JSON.parse(json);
+  const prices = data.prices;
+
+  const price = prices[fecha];
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.log(
+    `El charter ${name} en la fecha ${fecha} tiene un precio ${price}`
+  );
+
   await browser.close();
 }
+
+// Iniciar el servidor
+app.listen(app.get("port"), () => {
+  console.log("Aplicación ejecutándose en el puerto", app.get("port"));
+});
